@@ -1,0 +1,52 @@
+# Visual Studio specific files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+bin/
+obj/
+
+# NUGET packages
+*.nupkg
+packages/
+# The packages folder can be ignored if NuGet restore is enabled, but should be kept if the project uses packages.config.
+# If you're using NUGET, you will want to uncomment the line above.
+
+# MSTest test Results
+TestResults/
+
+# NCrunch
+_NCrunch_*
+.ncrunchsolution
+
+# Resharper
+_ReSharper.*
+*.DotSettings.user
+
+# SQL Server files
+*.mdf
+*.ldf
+
+# Node.js files
+node_modules/
+
+# Bower packages
+bower_components/
+
+# Web workbench sass files
+*.scss.cs
+
+# Visual Studio 6 auto-generated files
+*.dll
+*.tlb
+*.olb
+*.ocx
+*.exe
+
+# Others
+*.log
+*.vspscc
+*.vssscc

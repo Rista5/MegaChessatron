@@ -1,0 +1,3 @@
+Update 3.1.1s MegaChessatron
+1. Flicker on Setup board fixed
+2. Issue with player indication after Board Setup fixed

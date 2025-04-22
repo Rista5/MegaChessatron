@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MegaChessatron", "MegaChessatron\MegaChessatron.csproj", "{5CF485DA-D2FB-4C08-9434-745D38F9E1D5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{86528E90-DB58-4230-A0BC-9ACE2CEC9480} = {86528E90-DB58-4230-A0BC-9ACE2CEC9480}
+		{A707FD90-72CA-4658-B2FB-826F7670FE44} = {A707FD90-72CA-4658-B2FB-826F7670FE44}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iscrtavanje", "Iscrtavanje\Iscrtavanje.csproj", "{A707FD90-72CA-4658-B2FB-826F7670FE44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessEngine", "ChessEngine\ChessEngine.csproj", "{86528E90-DB58-4230-A0BC-9ACE2CEC9480}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5CF485DA-D2FB-4C08-9434-745D38F9E1D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CF485DA-D2FB-4C08-9434-745D38F9E1D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CF485DA-D2FB-4C08-9434-745D38F9E1D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CF485DA-D2FB-4C08-9434-745D38F9E1D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A707FD90-72CA-4658-B2FB-826F7670FE44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A707FD90-72CA-4658-B2FB-826F7670FE44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A707FD90-72CA-4658-B2FB-826F7670FE44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A707FD90-72CA-4658-B2FB-826F7670FE44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86528E90-DB58-4230-A0BC-9ACE2CEC9480}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86528E90-DB58-4230-A0BC-9ACE2CEC9480}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86528E90-DB58-4230-A0BC-9ACE2CEC9480}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86528E90-DB58-4230-A0BC-9ACE2CEC9480}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
