@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MegaChessatron", "MegaChessatron\MegaChessatron.csproj", "{5CF485DA-D2FB-4C08-9434-745D38F9E1D5}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MegaChessatron", "MegaChess
 		{A707FD90-72CA-4658-B2FB-826F7670FE44} = {A707FD90-72CA-4658-B2FB-826F7670FE44}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iscrtavanje", "Iscrtavanje\Iscrtavanje.csproj", "{A707FD90-72CA-4658-B2FB-826F7670FE44}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Draw", "Iscrtavanje\Draw.csproj", "{A707FD90-72CA-4658-B2FB-826F7670FE44}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessEngine", "ChessEngine\ChessEngine.csproj", "{86528E90-DB58-4230-A0BC-9ACE2CEC9480}"
 EndProject
@@ -34,5 +34,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EEA86DC0-5F13-43F6-9817-412565F08E7B}
 	EndGlobalSection
 EndGlobal

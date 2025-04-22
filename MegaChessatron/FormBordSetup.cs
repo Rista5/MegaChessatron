@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using Draw;
+using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Iscrtavanje;
 
 namespace MegaChessatron
 {
@@ -19,7 +13,7 @@ namespace MegaChessatron
         }
 
         int widthForm, heightForm;
-        Tabla tabla = new Tabla(40,40);
+        Table tabla = new Table(40, 40);
 
         #region Property
 
@@ -30,7 +24,7 @@ namespace MegaChessatron
         }
 
         public ulong WhiteBishop2
-        { get; set;}
+        { get; set; }
 
         public ulong WhiteKing
         { get; set; }
@@ -46,7 +40,7 @@ namespace MegaChessatron
         {
             widthForm = this.ClientSize.Width - panel1.Width;
             heightForm = this.ClientSize.Height - panel1.Height;
-            tabla.Prikaci(panel1);
+            tabla.Attach(panel1);
             tabla.Clicked += this.mouseClick;
         }
 
@@ -109,32 +103,32 @@ namespace MegaChessatron
             {
                 ulong b = BlackKing;
                 BlackKing = bit;
-                tabla.IzbrisiFiguru(b);
-                tabla.IscrtajFiguru(bit, Global.BlackKing);
+                tabla.RemoveFigure(b);
+                tabla.DrawFigure(bit, Global.BlackKing);
                 //tabla.Refresh();
             }
             if (rbtnWhiteBishop1.Checked)
             {
                 ulong b = WhiteBishop1;
                 WhiteBishop1 = bit;
-                tabla.IzbrisiFiguru(b);
-                tabla.IscrtajFiguru(bit, Global.WhiteBishop1);
+                tabla.RemoveFigure(b);
+                tabla.DrawFigure(bit, Global.WhiteBishop1);
                 //tabla.Refresh();
             }
             if (rbtnWhiteBishop2.Checked)
             {
                 ulong b = WhiteBishop2;
                 WhiteBishop2 = bit;
-                tabla.IzbrisiFiguru(b);
-                tabla.IscrtajFiguru(bit, Global.WhiteBishop1);
+                tabla.RemoveFigure(b);
+                tabla.DrawFigure(bit, Global.WhiteBishop1);
                 //tabla.Refresh();
             }
             if (rbtnWhiteKing.Checked)
             {
                 ulong b = WhiteKing;
                 WhiteKing = bit;
-                tabla.IzbrisiFiguru(b);
-                tabla.IscrtajFiguru(bit, Global.WhiteKing);
+                tabla.RemoveFigure(b);
+                tabla.DrawFigure(bit, Global.WhiteKing);
                 //tabla.Refresh();
             }
         }

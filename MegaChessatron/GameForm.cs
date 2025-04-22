@@ -1,23 +1,18 @@
-﻿using System;
+﻿using ChessEngine;
+using Draw;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Iscrtavanje;
-using ChessEngine;
 using System.IO;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace MegaChessatron
 {
-    public partial class Form1 : Form
+    public partial class GameForm : Form
     {
 
-        public Form1()
+        public GameForm()
         {
             InitializeComponent();
             this.DoubleBuffered = true;
@@ -26,7 +21,7 @@ namespace MegaChessatron
         #region Atributes
 
         int widthForm, heightForm;
-        Tabla tablica = new Tabla(50, 50);
+        Table tablica = new Table(50, 50);
         private Board _board;
         private bool _ai;
 
@@ -44,15 +39,15 @@ namespace MegaChessatron
                 foreach (Figure f in list)
                 {
                     if (f is King)
-                        tablica.IscrtajFiguru(f.BitBoard, Global.WhiteKing);
-                    else tablica.IscrtajFiguru(f.BitBoard, Global.WhiteBishop1);
+                        tablica.DrawFigure(f.BitBoard, Global.WhiteKing);
+                    else tablica.DrawFigure(f.BitBoard, Global.WhiteBishop1);
                 }
                 list = _board.BlackPieces;
                 foreach (Figure f in list)
                 {
                     if (f is King)
-                        tablica.IscrtajFiguru(f.BitBoard, Global.BlackKing);
-                    else tablica.IscrtajFiguru(f.BitBoard, Properties.Resources.Chess_bdt60);
+                        tablica.DrawFigure(f.BitBoard, Global.BlackKing);
+                    else tablica.DrawFigure(f.BitBoard, Properties.Resources.Chess_bdt60);
                 }
                 //treba da se povezu API
                 if (AI)
@@ -89,7 +84,7 @@ namespace MegaChessatron
         {
             widthForm = this.ClientSize.Width - panel1.Width;
             heightForm = this.ClientSize.Height - panel1.Height;
-            tablica.Prikaci(this.panel1);
+            tablica.Attach(this.panel1);
             tablica.checkPlayer += this.checkPlayerHandler;
             AI = true;
             PlayerIndication();
@@ -131,7 +126,7 @@ namespace MegaChessatron
             listW.Add(new Bishop(Board.FieldOnBoard('8', 'G'), true));
             listB.Add(new King(Board.FieldOnBoard('1', 'H'), false));
             listW.Add(new Bishop(Board.FieldOnBoard('8', 'F'), true));
-            
+
             //Board = new Board(listW, listB);//ovo je pravilo gresku
 
             Dictionary<ulong, HashNode> tmp;
@@ -168,7 +163,7 @@ namespace MegaChessatron
             lblSeachDeapth.Text = "SearchDepth: " + Board.SearchDepth.ToString();
         }
 
-        
+
 
         private void setupBoardToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -248,7 +243,7 @@ namespace MegaChessatron
 
         private void loadTranspositionTableToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(openFileDialog.ShowDialog()==DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 using (FileStream f = new FileStream(openFileDialog.FileName, FileMode.Open))
                 {
@@ -259,7 +254,7 @@ namespace MegaChessatron
 
         private void saveTranspositionTableToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(saveFileDialog.ShowDialog()==DialogResult.OK)
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 using (FileStream f = new FileStream(saveFileDialog.FileName, FileMode.Create))
                 {
@@ -270,7 +265,7 @@ namespace MegaChessatron
 
         private void checkPlayerHandler(object sender, EventArgs e)
         {
-            if(!_board.WhiteOnMove)
+            if (!_board.WhiteOnMove)
             {
                 btnCrni.BackColor = Color.FromKnownColor(KnownColor.Control);
                 btnBeli.BackColor = Color.Red;
@@ -296,10 +291,10 @@ namespace MegaChessatron
                     Board.LoadTableXML(f);
                 }
             }
-            catch (IOException e)
+            catch (IOException)
             {
-                MessageBox.Show("Transposition table went on a smoke break. Left a message: \"Cu se vrnem!\"","Table load",
-                    MessageBoxButtons.OK,MessageBoxIcon.Information);
+                MessageBox.Show("Transposition table went on a smoke break. Left a message: \"Cu se vrnem!\"", "Table load",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -312,7 +307,7 @@ namespace MegaChessatron
                     Board.SaveTableXML(f);
                 }
             }
-            catch (IOException e)
+            catch (IOException)
             {
                 MessageBox.Show("Transposition table died on transportation to storage facility. RIP in peace", "Table load",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);

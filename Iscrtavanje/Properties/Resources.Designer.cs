@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Iscrtavanje.Properties {
+namespace Draw.Properties {
     using System;
     
     

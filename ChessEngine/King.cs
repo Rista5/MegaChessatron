@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChessEngine
+﻿namespace ChessEngine
 {
     public class King : Figure
     {
@@ -18,10 +12,12 @@ namespace ChessEngine
         }
 
         #region Methodes
+
         public int NumberOfAvailableFileds(ulong enemyAttacks)
         {
             return CountOnes(this.AvailableFields(enemyAttacks));
         }
+
         public ulong AvailableFields(ulong enemyAttacks)
         {
             ulong available = BitBoard;
@@ -37,28 +33,26 @@ namespace ChessEngine
             } while (previous != available);
             return available;
         }
+
         public override ulong AttackedFields(ulong otherFigures = 0)
         {
-            ulong tmp = this.BitBoard;
-            //this.PrintDiagnosticBitBoard(tmp);
-            tmp = (tmp << 1) & (ulong)Field.notHFile | (tmp >> 1) & (ulong)Field.notAFile | tmp;
-            //tmp = ShiftLeft(BitBoard) & (ulong)Field.notHFile | ShiftRight(BitBoard) & (ulong)Field.notAFile | tmp;
-            //this.PrintDiagnosticBitBoard(tmp);
-            tmp = (tmp << 8) | (tmp >> 8) | tmp;
-            //this.PrintDiagnosticBitBoard(tmp);
+            ulong bitBoard = this.BitBoard;
 
-            return tmp^BitBoard;
+            bitBoard = (bitBoard << 1) & (ulong)Field.notHFile | (bitBoard >> 1) & (ulong)Field.notAFile | bitBoard;
+
+            bitBoard = (bitBoard << 8) | (bitBoard >> 8) | bitBoard;
+
+            return bitBoard ^ BitBoard;
 
         }
+
         public override ulong PosibleMovesBitBoard(ulong friends = 0, ulong enemies = 0, ulong enemyAttacks = 0)
         {
-            ulong tmp= base.PosibleMovesBitBoard(friends, enemies, enemyAttacks);
-            //PrintDiagnosticBitBoard(tmp);
-            //PrintDiagnosticBitBoard(enemyAttacks);
-            //PrintDiagnosticBitBoard(tmp & enemyAttacks);
+            ulong tmp = base.PosibleMovesBitBoard(friends, enemies, enemyAttacks);
             return tmp - (tmp & enemyAttacks);
         }
-        public static int CountOnes(ulong number)//premestiti mozda
+
+        public static int CountOnes(ulong number)
         {
             ulong tmp = number;
             int counter = 0;
@@ -70,13 +64,15 @@ namespace ChessEngine
             }
             return counter;
         }
-        public override bool Move(ulong newPosition, ulong friends,ulong enemies, ulong enemyAttacks)
+
+        public override bool Move(ulong newPosition, ulong friends, ulong enemies, ulong enemyAttacks)
         {
             ulong i = newPosition & enemyAttacks;
             if ((newPosition & enemyAttacks) == 0)
-                return base.Move(newPosition, friends,enemies, enemyAttacks);
+                return base.Move(newPosition, friends, enemies, enemyAttacks);
             else return false;
         }
+
         #endregion
     }
 }

@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using MegaChessatron.Properties;
+using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using MegaChessatron.Properties;
 
 namespace MegaChessatron
 {
- 
+
     public partial class FormIcons : Form
     {
         public FormIcons()
@@ -45,21 +39,21 @@ namespace MegaChessatron
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             Slika s = (Slika)cbxWhiteBishop.SelectedItem;
-            pictureBox1.Image=(Image)s._picture;
+            pictureBox1.Image = s._picture;
             Bishop = s._picture;
         }
 
         private void cbxWhiteKing_SelectedIndexChanged(object sender, EventArgs e)
         {
             Slika s = (Slika)cbxWhiteKing.SelectedItem;
-            pbxWhiteKing.Image = (Image)s._picture;
+            pbxWhiteKing.Image = s._picture;
             WhiteKing = s._picture;
         }
 
         private void cbxBlackKing_SelectedIndexChanged(object sender, EventArgs e)
         {
             Slika s = (Slika)cbxBlackKing.SelectedItem;
-            pbxBlackKing.Image = (Image)s._picture;
+            pbxBlackKing.Image = s._picture;
             BlackKing = s._picture;
         }
     }
@@ -71,7 +65,7 @@ namespace MegaChessatron
 
         public Slika(Bitmap s, string n)
         {
-            _picture = new Bitmap(s,new Size(75,75));
+            _picture = new Bitmap(s, new Size(75, 75));
             _naziv = n;
         }
 

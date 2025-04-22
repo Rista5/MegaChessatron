@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Xml.Serialization;
-using System.Xml;
 using System.Runtime.Serialization;
 using System.Threading;
-//za ispravku trebalo bi da se doda da se u previous boards dodaje tabla i kad crni pravi potez
 namespace ChessEngine
 {
     public enum BishopPositionEval : ulong
     {
-        
+
     }
     public class Board
     {
@@ -25,10 +19,10 @@ namespace ChessEngine
         private ulong _blackPositions;
         private bool _whiteOnMove;
         private static List<Board> _previousBoards;
-        private Dictionary<ulong, HashNode> _transpositionTable;//mozda je bolje da je static
+        private Dictionary<ulong, HashNode> _transpositionTable;
         private static int _searchDepth;
 
-        private static int[] PushToEdges={
+        private static int[] PushToEdges ={
     100, 90, 80, 70, 70, 80, 90, 100,
      90, 70, 60, 50, 50, 60, 70,  90,
      80, 60, 40, 30, 30, 40, 60,  80,
@@ -38,7 +32,7 @@ namespace ChessEngine
      90, 70, 60, 50, 50, 60, 70,  90,
     100, 90, 80, 70, 70, 80, 90, 100
   };
-        private static int[] BishopsCentralised={
+        private static int[] BishopsCentralised ={
     0, 1, 2, 3, 3, 2, 1, 0,
     1, 3, 4, 5, 5, 4, 3, 1,
     2, 4, 6, 7, 7, 6, 4, 2,
@@ -58,16 +52,7 @@ namespace ChessEngine
     0, 1, 2, 1, 1, 2, 1, 0,
     0, 0, 0, 0, 0, 0, 0, 0
   };
-  //      private static int[] KingCentralised ={
-  //  0, 0, 0, 0, 0, 0, 0, 0,
-  //  0, 1, 1, 1, 1, 1, 1, 0,
-  //  0, 1, 2, 2, 2, 2, 1, 0,
-  //  0, 1, 2, 3, 3, 2, 1, 0,
-  //  0, 1, 2, 3, 3, 2, 1, 0,
-  //  0, 1, 2, 2, 2, 2, 1, 0,
-  //  0, 1, 1, 1, 1, 1, 1, 0,
-  //  0, 0, 0, 0, 0, 0, 0, 0
-  //};
+
 
         #region Properties
 
@@ -134,7 +119,7 @@ namespace ChessEngine
                 if (_whitePieces != null)
                 {
                     InitialiseWhiteAttack();
-                    
+
                 }
             }
         }
@@ -152,7 +137,7 @@ namespace ChessEngine
                 if (_blackPieces != null)
                 {
                     InitialiseBlackAttack();
-                    
+
                 }
             }
         }
@@ -221,7 +206,7 @@ namespace ChessEngine
                 //Figure.PrintDiagnosticBitBoard(f.AttackedFields(WhitePositions));
                 //Figure.PrintDiagnosticBitBoard(WhitePositions);
                 tmp = tmp | f.AttackedFields(WhitePositions); //CODE 123
-                
+
             }
             WhiteAttackBoard = tmp;
         }
@@ -238,7 +223,7 @@ namespace ChessEngine
         #endregion
 
         public Board() { }
-        public Board(List<Figure> white, List<Figure> black, Dictionary<ulong, HashNode> dic=null)//ispravljeno white on move na false
+        public Board(List<Figure> white, List<Figure> black, Dictionary<ulong, HashNode> dic = null)//ispravljeno white on move na false
         {
             WhitePieces = white;
             BlackPieces = black;
@@ -261,14 +246,14 @@ namespace ChessEngine
         public Board(Board b)
         {
             WhitePieces = new List<Figure>();
-            foreach(Figure f in b.WhitePieces)
+            foreach (Figure f in b.WhitePieces)
             {
                 if (f is King)
                     AddWhitePiece(new King((King)f));
                 else if (f is Bishop)
                     AddWhitePiece(new Bishop((Bishop)f));
             }
-            WhitePositions = PositionOfWhitePieces;//ne mora ovo, moze samo dodela ipak je isto
+            WhitePositions = PositionOfWhitePieces;
             InitialiseWhiteAttack();
             BlackPieces = new List<Figure>();
             foreach (Figure f in b.BlackPieces)
@@ -287,7 +272,6 @@ namespace ChessEngine
         {
             WhitePieces.Add(f);
             f.PosibleCapture += PosibleCaptureHandler;
-            //f.FigureMoved += FigureMovedHandler;
         }
         public void AddBlackPiece(Figure f)
         {
@@ -308,7 +292,7 @@ namespace ChessEngine
 
         #endregion
 
-        public static ulong FieldOnBoard(char number, char file)//mozda bi mogla da se korisiti enumeracija??
+        public static ulong FieldOnBoard(char number, char file)
         {
             ulong tmp;
             switch (file)
@@ -349,37 +333,26 @@ namespace ChessEngine
                     tmp = 1;
                     break;
             }
-            int num = number - '0';//Int32.Parse(number);
+            int num = number - '0';
             tmp = tmp << ((num - 1) * 8);
             return tmp;
         }
-        public bool isEqual(Board b)//nije garantovano ispravno, ali poenta je da radi to sto treba
+        public bool isEqual(Board b)
         {
-            //Figure.PrintDiagnosticBitBoard(BlackPositions);
-            //Figure.PrintDiagnosticBitBoard(b.BlackPositions);
-            //Figure.PrintDiagnosticBitBoard(WhitePositions);
-            //Figure.PrintDiagnosticBitBoard(b.WhitePositions);
 
-            //Figure.PrintDiagnosticBitBoard(BlackAttackBoard);
-            //Figure.PrintDiagnosticBitBoard(b.BlackAttackBoard);
-            //Figure.PrintDiagnosticBitBoard(WhiteAttackBoard);
-            //Figure.PrintDiagnosticBitBoard(b.WhiteAttackBoard);
             if ((WhiteAttackBoard == b.WhiteAttackBoard) && (WhitePositions == b.WhitePositions)
                 && (BlackAttackBoard == b.BlackAttackBoard) && (BlackPositions == b.BlackPositions) &&
-                (WhiteOnMove==b.WhiteOnMove))
+                (WhiteOnMove == b.WhiteOnMove))
                 return true;
             else return false;
         }
         public void SaveTableXML(FileStream f)
         {
-
-            //XmlSerializer sr= new XmlSerializer(typeof(Dictionary<ulong, HashNode>));
             DataContractSerializer sr = new DataContractSerializer(typeof(Dictionary<ulong, HashNode>));
-            sr.WriteObject(f,TranspositionTable);
+            sr.WriteObject(f, TranspositionTable);
         }
         public void LoadTableXML(FileStream f)
         {
-            //XmlSerializer sr = new XmlSerializer(typeof(Dictionary<ulong, HashNode>));
             DataContractSerializer sr = new DataContractSerializer(typeof(Dictionary<ulong, HashNode>));
             TranspositionTable = (Dictionary<ulong, HashNode>)sr.ReadObject(f);
         }
@@ -397,13 +370,13 @@ namespace ChessEngine
                 CheckMate(this, new EventArgs());
         }
         public delegate void HighlightDelegate(ulong highlight);
-        public delegate void MoveDelegate(ulong previous, ulong next,Figure fig=null);
+        public delegate void MoveDelegate(ulong previous, ulong next, Figure fig = null);
 
         public event MoveDelegate FigureMoved;
-        protected void FigureMovedActivate(ulong previousPosition, ulong nextPosition,Figure f=null)
+        protected void FigureMovedActivate(ulong previousPosition, ulong nextPosition, Figure f = null)
         {
             if (FigureMoved != null)
-                FigureMoved(previousPosition, nextPosition,f);
+                FigureMoved(previousPosition, nextPosition, f);
         }
         public event HighlightDelegate Highlight;
         protected void HighLightActivate(ulong attackedFields)
@@ -420,7 +393,7 @@ namespace ChessEngine
         public event EventHandler Draw;
         private void DrawActivate()
         {
-            Draw?.Invoke(this,new EventArgs());
+            Draw?.Invoke(this, new EventArgs());
         }
         #endregion
 
@@ -439,10 +412,10 @@ namespace ChessEngine
                         Figure.InFocus = f;
                         figureWasClicked = true;
                         ulong otherFigures = Board.PositionsOfFigures(WhitePieces);
-                    //    f.PrintDiagnosticBitBoard(f.BitBoard);
-                        ulong fields = f.PosibleMovesBitBoard(WhitePositions,BlackPositions,BlackAttackBoard);
-                    //    f.PrintDiagnosticBitBoard(fields);
-                       
+                        //    f.PrintDiagnosticBitBoard(f.BitBoard);
+                        ulong fields = f.PosibleMovesBitBoard(WhitePositions, BlackPositions, BlackAttackBoard);
+                        //    f.PrintDiagnosticBitBoard(fields);
+
                         HighLightActivate(fields);
                         return;
                     }
@@ -457,7 +430,7 @@ namespace ChessEngine
                         Figure.InFocus = f;
                         figureWasClicked = true;
                         ulong otherFigures = Board.PositionsOfFigures(BlackPieces);
-                        ulong fields = f.PosibleMovesBitBoard(BlackPositions, WhitePositions,WhiteAttackBoard);
+                        ulong fields = f.PosibleMovesBitBoard(BlackPositions, WhitePositions, WhiteAttackBoard);
 
                         HighLightActivate(fields);
                         return;
@@ -486,10 +459,10 @@ namespace ChessEngine
                     enemyAttacks = WhiteAttackBoard;
                     friends = BlackPositions;
                 }
-                
+
 
                 ulong tmp = Figure.InFocus.BitBoard;
-                if (Figure.InFocus.Move(position,friends, enemies,enemyAttacks))
+                if (Figure.InFocus.Move(position, friends, enemies, enemyAttacks))
                 {
                     FigureMovedActivate(tmp, position);
                     if (WhiteOnMove)
@@ -507,17 +480,17 @@ namespace ChessEngine
                 others = others | f.BitBoard;
             return others;
         }
-        private void FigureMovedHandler(ulong previous, ulong next,Figure inputFigure=null)//napisati ga kompaktnije
+        private void FigureMovedHandler(ulong previous, ulong next, Figure inputFigure = null)//napisati ga kompaktnije
         {
             Figure figure;
             if (inputFigure != null)
                 figure = inputFigure;
             else figure = Figure.InFocus;
-            if (figure.White||(figure == null))//mozda ne treba null
+            if (figure.White || (figure == null))//mozda ne treba null
             {
                 WhitePositions = WhitePositions - (WhitePositions & previous);
                 WhitePositions = WhitePositions | next;
-                
+
                 InitialiseWhiteAttack();
                 foreach (Figure f in BlackPieces)
                 {
@@ -541,7 +514,7 @@ namespace ChessEngine
             {
                 BlackPositions = BlackPositions - (BlackPositions & previous);
                 BlackPositions = BlackPositions | next;
-                
+
                 InitialiseBlackAttack();
                 foreach (Figure f in WhitePieces)
                 {
@@ -551,7 +524,7 @@ namespace ChessEngine
                         int availableFields = k.NumberOfAvailableFileds(BlackAttackBoard);
                         if (availableFields == 0)
                             CheckMateActivate();
-                        else if (availableFields == 1 && k.PosibleMovesBitBoard(WhitePositions,BlackPositions,BlackAttackBoard) == 0)
+                        else if (availableFields == 1 && k.PosibleMovesBitBoard(WhitePositions, BlackPositions, BlackAttackBoard) == 0)
                         {
                             DrawActivate();
                             //mozda da postoji property za available fields, i da se postavlja prilikom pomeranja figure,samo za kralja naravno, da se ne bi svaki put racunalo
@@ -570,8 +543,8 @@ namespace ChessEngine
             //else PreviousBoards[0].WhiteOnMove = true;
 
         }
-        
-        private void PosibleCaptureHandler(object sender,EventArgs e)
+
+        private void PosibleCaptureHandler(object sender, EventArgs e)
         {
             Figure send;
             if (sender is Figure)
@@ -581,9 +554,9 @@ namespace ChessEngine
             if (send.White)
                 list = BlackPieces;
             else list = WhitePieces;
-            for(int i=0;i<list.Count;i++)
+            for (int i = 0; i < list.Count; i++)
             {
-                if(list[i].BitBoard==send.BitBoard)
+                if (list[i].BitBoard == send.BitBoard)
                 {
                     list.RemoveAt(i);
                     break;
@@ -606,7 +579,7 @@ namespace ChessEngine
         {
             DeselectActivate();
             bool figureWasClicked = false;
-            
+
             foreach (Figure f in BlackPieces)
             {
                 if (f.BitBoard == position)
@@ -616,7 +589,7 @@ namespace ChessEngine
                     ulong otherFigures = Board.PositionsOfFigures(BlackPieces);
 
                     ulong fields = f.PosibleMovesBitBoard(BlackPositions, WhitePositions, WhiteAttackBoard);
-                    
+
                     HighLightActivate(fields);
                     return;
                 }
@@ -630,13 +603,13 @@ namespace ChessEngine
                 ulong enemyAttacks;
                 if (Figure.InFocus == null)
                     return;
-     
+
                 list = BlackPieces;
                 enemies = WhitePositions;
                 enemyAttacks = WhiteAttackBoard;
                 friends = BlackPositions;
-                
-                
+
+
 
                 ulong tmp = Figure.InFocus.BitBoard;
                 if (Figure.InFocus.Move(position, friends, enemies, enemyAttacks))
@@ -649,8 +622,6 @@ namespace ChessEngine
                         WhiteOnMove = true;
                         Thread NitAI = new Thread(GenerateMoveAI);
                         NitAI.Start();
-                        //GenerateMoveAI();
-                        //NitAI.Join();
                     }
                     Figure.InFocus = null;
                 }
@@ -658,19 +629,15 @@ namespace ChessEngine
             }
         }
 
-        
-        
-        private void GenerateMoveAI()//white upadate
+
+
+        private void GenerateMoveAI()
         {
-            //for (int i = (PreviousBoards.Count - 1); i > 0; i--)//test, valjda ovako tacno radi
-            //    PreviousBoards[i] = PreviousBoards[i - 1];
-            //PreviousBoards[0] = new Board(this);
 
             Figure bestFigure = null;
             ulong bestMove = 0;
             int evalPrev = EvaluateBoard(true);
-            
-            //MinMax2(true, ref bestFigure, ref bestMove, 7);
+
             AlfaBeta(true, ref bestFigure, ref bestMove, -1000, 1000, SearchDepth);
             ulong tmp = bestFigure.BitBoard;
 
@@ -678,33 +645,13 @@ namespace ChessEngine
             WhitePositions = PositionOfWhitePieces;
             InitialiseBlackAttack();
             InitialiseWhiteAttack();
-            
-
-            //Figure.PrintDiagnosticBitBoard(BlackPositions);
-            //Figure.PrintDiagnosticBitBoard(BlackAttackBoard);
-            //Figure.PrintDiagnosticBitBoard(WhitePositions);
-            //Figure.PrintDiagnosticBitBoard(WhiteAttackBoard);
-            //Figure.PrintDiagnosticBitBoard(bestFigure.BitBoard);
-            //Figure.PrintDiagnosticBitBoard(bestMove);
 
             bestFigure.Move(bestMove, WhitePositions, BlackPositions, BlackAttackBoard);
-            FigureMovedActivate(tmp, bestMove,bestFigure);
+            FigureMovedActivate(tmp, bestMove, bestFigure);
             WhitePositions = PositionOfWhitePieces;
             InitialiseWhiteAttack();
 
-            //int evalPost = EvaluateBoard2(true);
-            //Figure.PrintDiagnosticBitBoard(BlackPositions);
-            //Figure.PrintDiagnosticBitBoard(BlackAttackBoard);
-            //Figure.PrintDiagnosticBitBoard(WhitePositions);
-            //Figure.PrintDiagnosticBitBoard(WhiteAttackBoard);
-
             WhiteOnMove = false;
-
-            //for (int i = (PreviousBoards.Count - 1); i > 0; i--)//test
-            //    PreviousBoards[i] = PreviousBoards[i - 1];
-            //PreviousBoards[0] = new Board(this);
-
-
         }
 
         public int EvaluateBoard(bool white)
@@ -713,7 +660,7 @@ namespace ChessEngine
                 if (f is King)
                     return 64 - ((King)f).NumberOfAvailableFileds(WhiteAttackBoard);
             return 0;
-           
+
         }
         public int EvaluateBoard2(bool white)
         {
@@ -724,11 +671,10 @@ namespace ChessEngine
                 if (!(f is King))
                 {
                     bishops |= f.BitBoard;
-                    bishopVal += cornerDistance2(f.BitBoard) << 3;
+                    bishopVal += BishopDistanceFromCenter(f.BitBoard) << 3;
                 }
                 else
                 {
-                    //bishopVal += cornerDistance2(f.BitBoard);// i kralj mozda zeli da bude sto blizi centru
                     whiteKing = (King)f;
                 }
 
@@ -756,15 +702,15 @@ namespace ChessEngine
 
 
                 if (NAF < 62)
-                    eval += cornerDistance2(whiteKing.BitBoard);
-                else eval += 8 - cornerDistance2(whiteKing.BitBoard);
+                    eval += BishopDistanceFromCenter(whiteKing.BitBoard);
+                else eval += 8 - BishopDistanceFromCenter(whiteKing.BitBoard);
                 if (NAF >= 62 && blackKing.IsAttacked(WhiteAttackBoard))
                 {
                     NAF += 100;
                 }
 
                 eval += BlackKingInCenter(blackKing.BitBoard);
-                return NAF + eval + ((4 - cornerDistance(blackKing.BitBoard)) << 5) + bishopVal;// - (kingDistance()/*<<4*/); //(NAF << 5);
+                return NAF + eval + ((4 - BlackKingDistanceFromCenter(blackKing.BitBoard)) << 5) + bishopVal;
             }
 
 
@@ -783,7 +729,7 @@ namespace ChessEngine
                 }
                 else
                 {
-                    bishopVal += KingCentralised[CalaculateIndex(f)];//ukljucujem i belog kralja da ide ka centru
+                    bishopVal += KingCentralised[CalaculateIndex(f)];
                     whiteKing = (King)f;
                 }
 
@@ -810,89 +756,29 @@ namespace ChessEngine
                     return -1000;
                 if (NAF > 62 && blackKing.IsAttacked(WhiteAttackBoard))
                     eval += 50;
-                eval+= PushToEdges[CalaculateIndex(blackKing)];
-                return NAF + (eval) + bishopVal - (KingDistance2(whiteKing,blackKing));//mozda da se eval shifta za 1
+                eval += PushToEdges[CalaculateIndex(blackKing)];
+                return NAF + (eval) + bishopVal - (KingDistance2(whiteKing, blackKing));
             }
         }
-        public int ArrayIndex(int x,int y)
+
+        public int ArrayIndex(int x, int y)
         {
-            return ((y-1)<<3) + x - 1;//<<3 je zamena za mnozenje sa 8
+            return ((y - 1) << 3) + x - 1;
         }
+
         public int CalaculateIndex(Figure f)
         {
             int x = 0, y = 0;
-            figureFiles(f.BitBoard, ref x, ref y);
-            return  ArrayIndex(x, y);
+            FigureFiles(f.BitBoard, ref x, ref y);
+            return ArrayIndex(x, y);
         }
 
-        //public int EvaluateBoard2(bool white)//kopija
-        //{
-        //    ulong bishops = 0;
-        //    int bishopVal = 0;
-        //    King whiteKing = null;
-        //    foreach (Figure f in WhitePieces)
-        //        if (!(f is King))
-        //        {
-        //            bishops |= f.BitBoard;
-        //            bishopVal += cornerDistance2(f.BitBoard) << 3;//ova izmena nema mnogo uticaja, posle one dve dole
-        //        }
-        //        else
-        //        {
-        //            //bishopVal += cornerDistance2(f.BitBoard);// i kralj mozda zeli da bude sto blizi centru
-        //            whiteKing = (King)f;
-        //        }
-
-        //    ulong bishopInDanger = bishops & BlackAttackBoard;
-        //    if (bishopInDanger != 0)
-        //        bishopInDanger = bishopInDanger - (bishopInDanger & WhiteAttackBoard);
-        //    if (!white && (bishopInDanger != 0))
-        //    {
-        //        return -1000;// int.MinValue;
-        //    }
-        //    else
-        //    {
-
-        //        King blackKing = null;
-
-        //        foreach (Figure f in BlackPieces)
-        //            if (f is King)
-        //                blackKing = (King)f;
-        //        //int.MaxValue
-        //        int eval = 0;
-        //        int NAF = 64 - (blackKing).NumberOfAvailableFileds(WhiteAttackBoard);
-        //        if (NAF == 64)
-        //            return 1000;//int.MaxValue;
-        //        if (NAF == 63 && blackKing.AvailableFields(WhiteAttackBoard) == blackKing.BitBoard && !white)
-        //            return -1000;
-
-        //        //if(NAF>=62)
-        //        //{
-        //        //    //pomereno odozgo
-        //        //    //eval += (8 - kingDistance())*10;
-        //        //    eval += 50;
-        //        //    if (blackKing.IsAttacked(WhiteAttackBoard))
-        //        //        eval += 100;
-        //        //}
-        //        //else
-        //        //{
-        //        //    eval += cornerDistance2(whiteKing.BitBoard);
-        //        //}
-        //        if (NAF < 62)
-        //            eval += cornerDistance2(whiteKing.BitBoard);//na osnovu testa ove dve izmene daju bolje rezultate
-        //        else eval += 8 - cornerDistance2(whiteKing.BitBoard);//izmenjeno je i corner distance, max je prebacen u +
-        //        if (NAF > 62 && blackKing.IsAttacked(WhiteAttackBoard))//ovde je sklonjeno = kod >=
-        //        {
-        //            NAF += 100;
-        //        }
-
-        //        eval += BlackKingInCenter(blackKing.BitBoard);
-        //        return NAF + eval + (4 - cornerDistance(blackKing.BitBoard)) * 20 + bishopVal;// - kingDistance(); //(NAF << 5);
-        //    }
-
-
-        //}
-
-        public bool EvaluateNode(bool white/*, ref bool blackKingChecked*/)//vraca true ako su bishopi napadnuti ili ako je pat ili ako sledi ista sekvenca poteza od malopre
+        /// <summary>
+        /// Returns true if bishops are attacked or if it's draw or if the sequence of moves repeats
+        /// </summary>
+        /// <param name="white"></param>
+        /// <returns></returns>
+        public bool EvaluateNode(bool white)
         {
             foreach (Board b in PreviousBoards)
             {
@@ -909,7 +795,7 @@ namespace ChessEngine
             foreach (Figure f in BlackPieces)
                 if (f is King)
                     blackKing = (King)f;
-            
+
             ulong bishopInDanger = bishops & BlackAttackBoard;
             if (bishopInDanger != 0)
                 bishopInDanger = bishopInDanger - (bishopInDanger & WhiteAttackBoard);
@@ -917,60 +803,77 @@ namespace ChessEngine
             {
                 return true;
             }
-            else if (!white && blackKing.AvailableFields(WhiteAttackBoard) == blackKing.BitBoard)//sprecava pat
+            else if (!white && blackKing.AvailableFields(WhiteAttackBoard) == blackKing.BitBoard) // prevents draw
                 return true;
             return false;
         }
 
-        public static void figureFiles(ulong bitBoard,ref int x,ref int y)//nalazi vrednosti gde se nalazi figura na tabli
+        /// <summary>
+        /// Finds places where figure is on the board
+        /// </summary>
+        /// <param name="bitBoard"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public static void FigureFiles(ulong bitBoard, ref int x, ref int y)
         {
             y = 1;
             ulong compare = 0xff;
-            while((bitBoard&compare)==0)
+            while ((bitBoard & compare) == 0)
             {
                 y++;
                 compare = compare << 8;
             }
             x = 1;
             compare = 0x8080808080808080;
-            while((bitBoard&compare)==0)
+            while ((bitBoard & compare) == 0)
             {
                 x++;
                 compare = compare >> 1;
             }
 
         }
-        public int cornerDistance(ulong blackKing)//rastojanje crnog kralja od centra
+
+        /// <summary>
+        /// Distance of black king from center
+        /// </summary>
+        /// <param name="blackKing"></param>
+        /// <returns></returns>
+        public int BlackKingDistanceFromCenter(ulong blackKing)
         {
-            int x=0, y=0;
-            figureFiles(blackKing,ref x,ref y);
+            int x = 0, y = 0;
+            FigureFiles(blackKing, ref x, ref y);
             if (x > 4)
                 x = 8 - x;
             else x = x - 1;
             if (y > 4)
                 y = 8 - y;
             else y = y - 1;
-            return x+y;//mislim da je ovako bolje, izbeci ce zabunu oko evaluacije na sredini ivicnih fileova
-            //return Math.Max(x, y);
+            return x + y;
         }
-        public int cornerDistance2(ulong bishop)//rastojanje bishopa od centra
+
+        /// <summary>
+        /// Distance of bishop from center
+        /// </summary>
+        /// <param name="bishop"></param>
+        /// <returns></returns>
+        public int BishopDistanceFromCenter(ulong bishop)
         {
             int x = 0, y = 0;
-            figureFiles(bishop, ref x, ref y);
+            FigureFiles(bishop, ref x, ref y);
             if (x > 4)
                 x = 8 - x;
             else x = x - 1;
             if (y > 4)
                 y = 8 - y;
             else y = y - 1;
-            return x+y;
-            //return Math.Min(x,y);
-            
+            return x + y;
         }
-        public int BlackKingInCenter(ulong blackKing)//sluzi da se crni kralj izgura od sredine
+
+
+        public int BlackKingInCenter(ulong blackKing)
         {
             int x = 0, y = 0;
-            figureFiles(blackKing, ref x, ref y);
+            FigureFiles(blackKing, ref x, ref y);
             if (x > 4)
                 x = 8 - x;
             else x = x - 1;
@@ -981,7 +884,9 @@ namespace ChessEngine
                 return -50;//-100
             else return 0;
         }
-        public int kingDistance()//rastojanje izmedju kraljeva
+
+
+        public int DistanceBetweenKings()
         {
             int x = 0, y = 0;
             int x2 = 0, y2 = 0;
@@ -989,20 +894,19 @@ namespace ChessEngine
             foreach (Figure k in WhitePieces)
             {
                 if (k is King)
-                    figureFiles(k.BitBoard, ref x, ref y);
+                    FigureFiles(k.BitBoard, ref x, ref y);
             }
 
             foreach (King k in BlackPieces)
             {
                 if (k is King)
-                    figureFiles(k.BitBoard, ref x2, ref y2);
+                    FigureFiles(k.BitBoard, ref x2, ref y2);
             }
 
             return Math.Max(Math.Abs(x - x2), Math.Abs(y - y2));
-            //return x - x2 + y - y2;
         }
 
-        public int KingDistance2(Figure whiteKing=null, Figure blackKing=null)
+        public int KingDistance2(Figure whiteKing = null, Figure blackKing = null)
         {
             int x = 0, y = 0;
             int x2 = 0, y2 = 0;
@@ -1011,144 +915,20 @@ namespace ChessEngine
                 foreach (Figure k in WhitePieces)
                 {
                     if (k is King)
-                        figureFiles(k.BitBoard, ref x, ref y);
+                        FigureFiles(k.BitBoard, ref x, ref y);
                 }
-            else figureFiles(whiteKing.BitBoard, ref x, ref y);
+            else FigureFiles(whiteKing.BitBoard, ref x, ref y);
 
             if (blackKing == null)
                 foreach (King k in BlackPieces)
                 {
                     if (k is King)
-                        figureFiles(k.BitBoard, ref x2, ref y2);
+                        FigureFiles(k.BitBoard, ref x2, ref y2);
                 }
-            else figureFiles(blackKing.BitBoard, ref x2, ref y2);
+            else FigureFiles(blackKing.BitBoard, ref x2, ref y2);
 
-            //return Math.Max(Math.Abs(x - x2), Math.Abs(y - y2));
             return Math.Abs(x - x2) + Math.Abs(y - y2);
         }
-
-        //algoritam bez tablice za test
-        //public int AlfaBeta(bool white, ref Figure bestFigure, ref ulong bestMove, int alpha, int beta, int depth)
-        //{
-        //    if (white)
-        //    {
-        //        int v = -1000;
-        //        BlackPositions = PositionOfBlackPieces;
-        //        InitialiseBlackAttack();
-
-
-        //        WhitePositions = PositionOfWhitePieces;
-        //        InitialiseWhiteAttack();
-        //        if (depth <= 0)
-        //            return EvaluateBoard2(true);
-
-        //        //bool blackKingChecked = false;
-        //        bool badMove = EvaluateNode(white/*, ref blackKingChecked*/);
-        //        if (badMove)
-        //            return -1000;// int.MinValue;
-
-        //        Figure curBest = null;
-        //        ulong curBestMove = 0;
-        //        foreach (Figure fig in WhitePieces)
-        //        {
-        //            ulong position = fig.BitBoard;
-        //            List<ulong> moveList = Figure.PosibleMovesStatic(fig, WhitePositions, BlackPositions, BlackAttackBoard);
-
-
-        //            foreach (ulong move in moveList)
-        //            {
-
-
-        //                fig.BitBoard = move;
-        //                int tmp = AlfaBeta(false, ref bestFigure, ref bestMove, alpha, beta, depth - 1);
-        //                alpha = Math.Max(alpha, tmp);
-        //                if (tmp > v)
-        //                {
-        //                    v = tmp;
-        //                    curBest = fig;
-        //                    curBestMove = move;
-        //                }
-        //                if (beta <= alpha)
-        //                    break;
-
-        //            }
-        //            fig.BitBoard = position;
-        //            WhitePositions = PositionOfWhitePieces;
-
-        //        }
-        //        bestFigure = curBest;
-        //        bestMove = curBestMove;
-
-        //        return v - 1;//vraca se sa minusom da ne bi isto evaluirao pobede na razlicitim dubinama
-
-        //    }
-        //    else
-        //    {
-        //        int v = 1000;
-        //        WhitePositions = PositionOfWhitePieces;
-        //        InitialiseWhiteAttack();
-
-        //        BlackPositions = PositionOfBlackPieces;
-        //        InitialiseBlackAttack();
-
-
-        //        if (depth <= 0)
-        //            return EvaluateBoard2(false);
-
-        //        //bool blackKingChecked = false;
-        //        bool badMove = EvaluateNode(white/*, ref blackKingChecked*/);
-        //        if (badMove)
-        //            return -1000; //int.MinValue;
-
-        //        // int.MaxValue;
-        //        Figure curBest = null;
-        //        ulong curBestMove = 0;
-        //        foreach (Figure fig in BlackPieces)
-        //        {
-        //            ulong position = fig.BitBoard;
-
-        //            List<ulong> moveList = Figure.PosibleMovesStatic(fig, BlackPositions, WhitePositions, WhiteAttackBoard);
-
-        //            //test za pat
-        //            if (moveList.Count == 0 && fig is King)
-        //            {
-        //                King blackKing = (King)fig;
-        //                if (blackKing.IsAttacked(WhiteAttackBoard))
-        //                    return 1000;// int.MaxValue;
-        //                else return -1000;// int.MinValue;
-        //            }
-
-        //            foreach (ulong move in moveList)
-        //            {
-
-        //                fig.BitBoard = move;
-        //                int tmp = AlfaBeta(true, ref bestFigure, ref bestMove, alpha, beta, depth - 1);
-        //                beta = Math.Min(beta, tmp);
-        //                if (tmp < v)
-        //                {
-        //                    v = tmp;
-        //                    curBest = fig;
-        //                    curBestMove = move;
-
-        //                }
-        //                if (beta <= alpha)
-        //                    break;
-        //            }
-        //            fig.BitBoard = position;
-        //            BlackPositions = PositionOfBlackPieces;
-        //        }
-        //        bestFigure = curBest;
-        //        bestMove = curBestMove;
-
-        //        return v - 1;
-
-        //    }
-
-        //}
-
-        //bestMove za node pravio je problem, kad se doda |, evaluacija je valjda poboljsana u odnosu na predhodnu verziju
-        //sklonjene su inicijalizacije pre upisa u tablicu sto moze da pravi problem!!! nije dokazano
-        //postoji neka sekvenca blizu ugla koja je petlja, treba da se istrazi kad se javlja i zbog cega
 
         public int AlfaBeta(bool white, ref Figure bestFigure, ref ulong bestMove, int alpha, int beta, int depth)
         {
@@ -1173,17 +953,17 @@ namespace ChessEngine
                     {
                         foreach (Figure f in WhitePieces)
                         {
-                            if ((node.Move & f.BitBoard) != 0)//nije bas najtacnije, sta ako treba da capture-uje figuru?? da li smo sigurni
+                            if ((node.Move & f.BitBoard) != 0)
                             {
-                                if (!ValidMoveFromTable(f, node.Move))
+                                if (IsValidMoveFromTable(f, node.Move))
                                 {
                                     bestFigure = f;
                                     bestMove = node.Move - f.BitBoard;
                                     v = node.BoardEvaluation;
-                                    return v - 1 -node.Depth;
+                                    return v - 1 - node.Depth;
                                 }
-                                else break;//ovako ce da nauci bolje poteze
-                            }//zbog funkcije validmove izbegava da dolazi u isto stanje na tabli, izbog toga predefinise vec postojecu vrednost za najbolji potez, tako uci
+                                else break;
+                            }//because of the validmove function, it avoids coming to the same state on the board, because of that it predefine the already existing value for the best move
                         }
 
                     }
@@ -1193,7 +973,7 @@ namespace ChessEngine
                     return EvaluateBoard3(true);
 
                 bool badMove = EvaluateNode(white);
-                if (depth<SearchDepth && badMove)//ovde treba ispravka ne moze ovako,mozda staticka dubina
+                if (depth < SearchDepth && badMove)
                     return -1000;
 
                 foreach (Figure fig in WhitePieces)
@@ -1226,7 +1006,7 @@ namespace ChessEngine
                 }
                 bestFigure = curBest;
                 bestMove = curBestMove;
-                
+
                 if (bestFigure == null)
                     return v - 1;
                 try
@@ -1244,17 +1024,17 @@ namespace ChessEngine
                         TranspositionTable.Add(key, node);
                     }
                 }
-                catch (ArgumentException e)
+                catch (ArgumentException)
                 {
                     TranspositionTable[key] = node;
                 }
-                catch (NullReferenceException e)//postoje slucajevi kad se ne postavi najbolja figura pa zbog toga izbijaju exceptioni
+                catch (NullReferenceException)
                 {
 
                 }
 
 
-                return v - 1;//vraca se sa minusom da ne bi isto evaluirao pobede na razlicitim dubinama
+                return v - 1;
 
             }
             else
@@ -1266,7 +1046,7 @@ namespace ChessEngine
                 BlackPositions = PositionOfBlackPieces;
                 InitialiseBlackAttack();
 
-                
+
                 Figure curBest = null;
                 ulong curBestMove = 0;
                 HashNode node;
@@ -1280,14 +1060,14 @@ namespace ChessEngine
 
                         foreach (Figure f in BlackPieces)
                         {
-                            if ((node.Move & f.BitBoard) != 0)//nije bas najtacnije, sta ako treba da capture-uje figuru?? da li smo sigurni
+                            if ((node.Move & f.BitBoard) != 0)
                             {
-                                if (!ValidMoveFromTable(f, node.Move))
+                                if (IsValidMoveFromTable(f, node.Move))
                                 {
                                     bestFigure = f;
                                     bestMove = node.Move - f.BitBoard;
                                     v = node.BoardEvaluation;
-                                    return v - 1 -node.Depth;
+                                    return v - 1 - node.Depth;
                                 }
                                 else break;
                             }
@@ -1296,7 +1076,7 @@ namespace ChessEngine
                     }
                 }
 
-                if (depth <= 0)//da se spusti ispod provere za tablicu!!!//spusteno
+                if (depth <= 0)
                     return EvaluateBoard3(false);
 
                 bool badMove = EvaluateNode(white);
@@ -1309,7 +1089,7 @@ namespace ChessEngine
 
                     List<ulong> moveList = Figure.PosibleMovesStatic(fig, BlackPositions, WhitePositions, WhiteAttackBoard);
 
-                    //test za pat
+                    // check for draw
                     if (moveList.Count == 0 && fig is King)
                     {
                         King blackKing = (King)fig;
@@ -1329,7 +1109,7 @@ namespace ChessEngine
                         fig.BitBoard = move;
                         int tmp = AlfaBeta(true, ref bestFigure, ref bestMove, alpha, beta, depth - 1);
                         beta = Math.Min(beta, tmp);
-                        if (tmp < v)//ovo ovde je netacno ali radi brze kad je tako, zasto??
+                        if (tmp < v)
                         {
                             v = tmp;
                             bestFigure = fig;
@@ -1337,8 +1117,7 @@ namespace ChessEngine
 
                         }
                         if (beta <= alpha)
-                            break;//proba zbog nullReferenceExceptiona
-                                  //return v - 1;
+                            break;
                     }
                     fig.BitBoard = position;
                     BlackPositions = PositionOfBlackPieces;
@@ -1351,9 +1130,9 @@ namespace ChessEngine
                     return v - 1;
                 try
                 {
-                    if (node != null &&  node.WhiteOnMove == white)
+                    if (node != null && node.WhiteOnMove == white)
                     {
-                        node.Move = bestMove | bestFigure.BitBoard;// bestMove;
+                        node.Move = bestMove | bestFigure.BitBoard; // bestMove;
                         node.Depth = depth;
                         node.BoardEvaluation = v;
                         node.WhiteOnMove = white;
@@ -1364,11 +1143,11 @@ namespace ChessEngine
                         TranspositionTable.Add(key, node);
                     }
                 }
-                catch (ArgumentException e)
+                catch (ArgumentException)
                 {
                     TranspositionTable[key] = node;
                 }
-                catch (NullReferenceException e)
+                catch (NullReferenceException)
                 {
 
                 }
@@ -1379,50 +1158,26 @@ namespace ChessEngine
 
         }
 
-        public bool ValidMoveFromTable(Figure f, ulong move)//returns false if move is valid
+
+        public bool IsValidMoveFromTable(Figure f, ulong move)
         {
             ulong startingPosition = f.BitBoard;
-            f.BitBoard = move^f.BitBoard;
+            f.BitBoard = move ^ f.BitBoard;
             WhitePositions = PositionOfWhitePieces;
-            InitialiseWhiteAttack();//izgleda treba da se izkljuci, fault sekvenca se ne prepoznaje zbog te razlike
-            //if (WhiteOnMove)
-            //    WhiteOnMove = false;
-            //else WhiteOnMove = true;
+            InitialiseWhiteAttack();
+
             bool retVal = EvaluateNode(WhiteOnMove);
-            //if (WhiteOnMove)
-            //    WhiteOnMove = false;
-            //else WhiteOnMove = true;
-            //Figure.PrintDiagnosticBitBoard(f.BitBoard);
-            //Figure.PrintDiagnosticBitBoard(WhitePositions);
-            //Figure.PrintDiagnosticBitBoard(WhiteAttackBoard);
-            //Figure.PrintDiagnosticBitBoard(move);
             f.BitBoard = startingPosition;
             WhitePositions = PositionOfWhitePieces;
             InitialiseWhiteAttack();
-            //Figure.PrintDiagnosticBitBoard(f.BitBoard);
-            //Figure.PrintDiagnosticBitBoard(WhitePositions);
-            //Figure.PrintDiagnosticBitBoard(WhiteAttackBoard);
             return retVal;
         }
 
-        public int SweetSpotForWhiteKing(ulong whiteKing)//kralj zeli da dodje na svoje odgovarajuce mesto, ne koristi se
-        {
-            int x = 0, y = 0;
-            figureFiles(whiteKing, ref x, ref y);
-            if (x > 4)
-                x = 8 - x;
-            else x = x - 1;
-            if (y > 4)
-                y = 8 - y;
-            else y = y - 1;
-            if ((x == 1 && y == 2) || (x == 2 && y == 1))
-                return 50;
-            else return 0;
-        }
+
         public int MinMax(bool white, ref Figure bestFigure, ref ulong bestMove, Figure inputFigure, ulong inputMove, int depth)
         {
 
-            if (white)//skloni input figure, input move, razmisljanje da se skloni best figure a ubaci 1 ulong
+            if (white)
             {
                 BlackPositions = PositionOfBlackPieces;
                 InitialiseBlackAttack();
@@ -1432,27 +1187,20 @@ namespace ChessEngine
                 InitialiseWhiteAttack();
                 if (depth <= 0)
                     return EvaluateBoard2(true);
-                //    return EvaluateBoard2(true);
-
-                //int curentEvalutation = EvaluateBoard2(white);
-                //if (curentEvalutation == int.MinValue || depth <= 0)
-                //    return curentEvalutation;
-                //bool blackKingChecked = false;
-                bool badMove = EvaluateNode(white/*,ref blackKingChecked*/);
+                bool badMove = EvaluateNode(white);
                 if (badMove)
-                    return -1000;// int.MinValue;
+                    return -1000;
 
-                int max = -1000;// int.MinValue;
+                int max = -1000;
                 Figure curBest = null;
                 ulong curBestMove = 0;
                 foreach (Figure fig in WhitePieces)
                 {
                     ulong position = fig.BitBoard;
                     List<ulong> moveList = Figure.PosibleMovesStatic(fig, WhitePositions, BlackPositions, BlackAttackBoard);
-                    foreach (ulong move in moveList)//ideja napravi figure pok na svakom nivou koji na kraju postavlja best figure
+                    foreach (ulong move in moveList)
                     {
 
-                        //fig.Move(move, WhitePositions, BlackPositions, BlackAttackBoard);//treba druga fja, neka koja ne proverava validnost poteza
                         fig.BitBoard = move;
                         int tmp = MinMax(false, ref bestFigure, ref bestMove, fig, move, depth - 1);
                         if (tmp > max)
@@ -1467,11 +1215,6 @@ namespace ChessEngine
                 }
                 bestFigure = curBest;
                 bestMove = curBestMove;
-                //return max;
-                //ovo je test
-                //if (blackKingChecked)
-                //if (max < int.MaxValue)
-                //        max += 20;
                 return max;
 
             }
@@ -1485,41 +1228,31 @@ namespace ChessEngine
 
 
                 if (depth <= 0)
-                    return EvaluateBoard2(true);//evaluira se za belog jer trazi najvise slobodnih pozicija
-                                                //    return EvaluateBoard2(false);
+                    return EvaluateBoard2(true); //it is evaluated for white because it is looking for the most vacant positions
 
-                //Figure.PrintDiagnosticBitBoard(WhitePositions);
-                //Figure.PrintDiagnosticBitBoard(WhiteAttackBoard);
-                //int curentEvalutation = EvaluateBoard2(white);
-                //if (curentEvalutation == int.MinValue || depth <= 0)
-                //    return curentEvalutation;
-                //bool blackKingChecked = false;
-                bool badMove = EvaluateNode(white/*, ref blackKingChecked*/);
+                bool badMove = EvaluateNode(white);
                 if (badMove)
-                    return -1000;// int.MinValue;
+                    return -1000;
 
-                int min = 1000;//int.MaxValue;
+                int min = 1000;
                 Figure curBest = null;
                 ulong curBestMove = 0;
                 foreach (Figure fig in BlackPieces)
                 {
                     ulong position = fig.BitBoard;
-                    //InitialiseWhiteAttack();
-                    //WhitePositions=PositionOfWhitePieces;
                     List<ulong> moveList = Figure.PosibleMovesStatic(fig, BlackPositions, WhitePositions, WhiteAttackBoard);
 
-                    //test za pat
+                    // check for draw
                     if (moveList.Count == 0 && fig is King)
                     {
                         King blackKing = (King)fig;
                         if (blackKing.IsAttacked(WhiteAttackBoard))
-                            return 1000;// int.MaxValue;
-                        else return -1000;// int.MinValue;
+                            return 1000;
+                        else return -1000;
                     }
-                    foreach (ulong move in moveList)//da se doda if za list count=0 da proveri pat??
+                    foreach (ulong move in moveList)
                     {
 
-                        //fig.Move(move, WhitePositions, BlackPositions, BlackAttackBoard);//treba druga fja, neka koja ne proverava validnost poteza
                         fig.BitBoard = move;
                         int tmp = MinMax(true, ref bestFigure, ref bestMove, fig, move, depth - 1);
                         if (tmp < min)
@@ -1533,11 +1266,6 @@ namespace ChessEngine
                 }
                 bestFigure = curBest;
                 bestMove = curBestMove;
-                //return min;
-                //ovo je test
-                //if (blackKingChecked)
-                //    if (min < int.MaxValue)
-                //       min += 20;
 
                 return min;
 
@@ -1560,7 +1288,6 @@ namespace ChessEngine
                 if (depth <= 0)
                     return EvaluateBoard2(true);
 
-                //bool blackKingChecked = false;
                 bool badMove = EvaluateNode(white/*, ref blackKingChecked*/);
                 if (badMove)
                     return -1000;// int.MinValue;
